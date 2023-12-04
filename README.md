@@ -1,4 +1,4 @@
-# SARrawSim is a Matlab based program for generating raw data from a general pulsed linear frequency-modulated synthetic aperture radar (SAR) operating in stripmap mode.
+# 'SARrawSim' is a Matlab-based program for generating raw data from a general pulsed linear frequency-modulated synthetic aperture radar (SAR) operating in stripmap mode.
 
 # Author: Alfonso J. Zozaya S.
 
@@ -10,7 +10,7 @@ The code consists of six (06) sections. The first section, Probing Scene Definit
 
 The code can be run as it is in its present form, but the user, according to their own requirements, can edit the sections: Probing Scene Definition and Drawing, Radar Parameters Definition, and Random Targets Generation. In any case, the radar parameters have to be defined based on slant range dr and cross-range du resolutions. The following two reccomendations are made: (1) From the range resolution dr, secondary values are calculated, including the bandwidth B = c/2dr, where c represents the speed of light. Additionally, the pulse duration is determined as tau=100/B, the chirp rate as k= B/tau, the fast-time sampling frequency as Fs=osfB, and its corresponding period as Ts= 1/Fs, where osf denotes the oversampling factor. The pulse to be transmitted is already defined based on parameters tau and B. (2) From the cross-resolution du=lambda0/2Dtheta, the horizontal half-power antenna beamwidth Dtheta, and carrier frequency f0 are determined. Then, from the Doppler frequency bandwidth BD=2v Dtheta/lambda0, the platform speed v and the pulse repetition interval tR=1/osfBD are specified. All values established at this stage constitute the metadata.
 
-# Focusing is Matlab based program for focusing raw data from a general pulsed linear frequency-modulated synthetic aperture radar (SAR) operating in stripmap mode using the Range-Doppler Algorithm (RDA).
+# 'Focusing' is a Matlab-based program for focusing raw data from a general pulsed linear frequency-modulated synthetic aperture radar (SAR) operating in stripmap mode using the Range-Doppler Algorithm (RDA).
 
 # Author: Alfonso J. Zozaya S.
 
