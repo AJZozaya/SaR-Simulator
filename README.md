@@ -16,7 +16,7 @@ The code can be run as it is in its present form, but the user, according to the
 
 # Code Summary Description
 
-This code loads the file 'data.mat' generated from 'SARrawSim' and applies the Range-Doppler Algorithm (RDA) to the raw data. The RDA is executed based on metadata contained in the file, resulting in a single complex radar image. The script successively calls the functions: 'eR=RaNGeC(P, e, NofS)', '[ERA, ERCA, fD]=RCMC(eR, NofR, dr, tR, r, f0, v)', and 'eRA=azimuthC(ERCA, v, fD, r, lambda0)'. These functions, included in the code itself, perform the core processes of the RDA, i.e., focusing the data in range, correcting range-cell migration, and focusing the data in azimuth, respectively. The outcome is the conversion of the raw data into a single complex radar image.
+This code loads the file 'data.mat' generated from 'SARrawSim' and applies the Range-Doppler Algorithm (RDA) to the raw data. The RDA is executed based on metadata contained in the file, resulting in a single complex radar image. The script successively calls the functions: 'eR=RaNGeC(P, e, NofS)', '[ERA, ERCA, fD]=RCMC(eR, NofR, dr, tR, r, f0, v)', and 'eRA=azimuthC(ERCA, v, fD, r, lambda0)'. These functions, included in the code itself, perform the core processes of the RDA, i.e., focusing the data in range, correcting range-cell migration, and focusing the data in azimuth, respectively. The outcome is the conversion of the raw data into a single look complex (SLC) radar image.
 
 # Usage
 
