@@ -85,9 +85,9 @@ function eR=RaNGeC(P,e,NofS)
 % e matrix. 10/20/2023. A. J. Zozaya
 
 nfft=size(e,2);
-ER=fft(e,nfft,2);
-H=conj(P);
-eR=ifft(H.*ER,nfft,2);
+ER=fft(e,nfft,2);                % DFT of rows
+H=conj(P);                       % range matched filter frequency response
+eR=ifft(H.*ER,nfft,2);           % range compression in the frequency domain and returning back to range domain
 
 eR=eR(:,1:NofS);
 end
@@ -146,9 +146,9 @@ n=mn(2);
 
 for i=1:n
     r0=r(i);
-    K_A=(2*v^2)/(r0*lambda0);
-    HA=exp(-1j*pi*(fD.^2)./K_A);
-    eRA(:,i)=ifft(HA.*ERCA(:,i),nfftA);         % compression of i-th column
+    K_A=(2*v^2)/(r0*lambda0);                   % croos-range (azimuth) space-chirp rate
+    HA=exp(-1j*pi*(fD.^2)./K_A);                % azimuth matched filter frequency response
+    eRA(:,i)=ifft(HA.*ERCA(:,i),nfftA);         % compression of the i-th column and returning back to cross-range domain
 end
 end
 
