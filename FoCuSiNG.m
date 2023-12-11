@@ -10,7 +10,7 @@ clc
 %% Loading raw data and metadata and general parameters definition
 c=3e8;                                  % [m/s] speed of light
 load rawdata.mat;
-lambda0=c/f0;                           % [m] carrer wavelength
+lambda0=c/f0;                           % [m] carrier wavelength
 
 h3=figure(3);
 set(gcf, 'WindowState', 'maximized');
