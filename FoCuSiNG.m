@@ -1,6 +1,6 @@
 % FoCuSiNG
 % FoCuSiNG implements the Range-Doppler Algorithm on the rawdata obtained
-% from SiM_5.m improved for visualization purposes. 10/24/2023. A. J.
+% from SARrawSim.m improved for visualization purposes. 10/24/2023. A. J.
 % Zozaya
 
 clear all
