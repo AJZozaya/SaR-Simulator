@@ -11,7 +11,7 @@
 % target ranging). Later on, the echo is created, Gaussian noise is added, 
 % and the result is visualized in A-scope type. Finally, a raw data image is 
 % rendered, and metadata and raw data are consolidated for further processing.
-% 10/20/2023. A. J. Zozaya
+% 07/17/2024. A. J. Zozaya
 
 clear all
 close all
@@ -31,16 +31,13 @@ r_scene=[rm, rm, rm, rM, rM, rM, rM, rm];
 u_scene=[um, uM, uM, uM, uM, um, um, um];
 
 %% Radar parameters definition
-% UAV and Radar parameters for trajectory drawing
-v=10;                           % [m/s] uav speed (from [Zozaya2016])
+
 c=3e8;                          % [m/s] speed of light
-tR=0.05;                        % [s] pulse repetition time = slow-time samplig time
-% Parameters for antenna pattern ground footprint drawing
-Dtheta=5*pi/180;                % [rad] 3 dB horizontal beamwidth
-m=tan(Dtheta/2);                % [ ] curve parameter
+
 % Transmitted pulse definition
 f0=2.4e9;                       % [Hz] carrier frequency
 dr=1;                           % [m] range resolution
+du=0.7;                         % [m] cross-range resolution
 B=c/(2*dr);                     % [Hz] bandwidth required for such a range resolution
 tau=100/B;                      % [s] pulse duration based on the criterion: B x tau = 100
 k=B/tau;                        % [Hz/s] chirp rate
@@ -59,6 +56,17 @@ P=fftshift(fft(p,nfft));        % spectrum of the transmitted pulse for processi
 df=Fs/nfft;                     % [Hz] frequency spectrum resolution
 f=-Fs/2:df:Fs/2-df;             % [Hz] frequency support for spectrum of the transmitted pulse
 
+% UAV and Radar parameters for trajectory drawing
+
+lambda0=c/f0;                   % [m] carrier wavelength 
+Dtheta=lambda0/(2*du);          % [rad] 3 dB horizontal beamwidth
+v=10;                           % [m/s] uav speed (from [Zozaya2016])
+BD=2*v*Dtheta/lambda0;          % [Hz] Doppler bandwidth
+tR=1/(osf*BD);                  % [s] pulse repetition time = slow-time samplig time
+
+
+% Parameters for antenna pattern ground footprint drawing
+m=tan(Dtheta/2);                % [ ] curve parameter
 
 %% Random targets generation
 NofT=10;                        % number of targets
@@ -87,7 +95,7 @@ while u<=Du/2;
     subplot(2,1,1)
     plot(r_target,u_target,'.',0,u,'+',r_scene,u_scene,r_footprint,u_footprint,'LineWidth',1.5)
     xlabel('$r$','Interpreter','latex')
-    ylabel('$u$','Interpreter','latex')
+    ylabel('$u$','Interpreter','latex','rotation',0)
     xlim([-10 Rm+Dr])
     ylim([-Du/2-10 Du/2+10])
     % axis tight equal
@@ -104,7 +112,7 @@ while u<=Du/2;
     end
 
     %% Addition of noise
-    N0=0.1.^2;                              % noise standard deviation
+    N0=0.1.^2;                              % noise power density
     e(n,:)=e(n,:)+sqrt(N0)*(randn(1,nfft)+1j*randn(1,nfft)); 
     
     %% Range-line visualization (A-scope)
@@ -112,14 +120,15 @@ while u<=Du/2;
     plot(t*c/(2e3),real(e(n,:)),'LineWidth', 1.5)
     xlim([rm rM+c*tau/2]./(1e3))
     ylim([-5 5])
-    xlabel('$u$','Interpreter','LaTeX')
+    xlabel('$r$','Interpreter','LaTeX')
+    ylabel('$e(t)$','Interpreter','LaTeX','rotation',0)
     % box off
     grid on
     grid minor
     ax=gca;
     ax.MinorGridAlpha = 1;                  % Make grid lines less transparent.
     ax.MinorGridColor = [0.1, 0.7, 0.2];    % Dark Green.
-    if n==800
+    if n==600
         print('simulator.svg','-dsvg')
     end
     %% Radar position update
