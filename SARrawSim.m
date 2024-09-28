@@ -11,7 +11,7 @@
 % target ranging). Later on, the echo is created, Gaussian noise is added, 
 % and the result is visualized in A-scope type. Finally, a raw data image is 
 % rendered, and metadata and raw data are consolidated for further processing.
-% 07/17/2024. A. J. Zozaya
+% 09/28/2024. A. J. Zozaya
 
 clear all
 close all
@@ -69,12 +69,38 @@ tR=1/(osf*BD);                  % [s] pulse repetition time = slow-time samplig 
 m=tan(Dtheta/2);                % [ ] curve parameter
 
 %% Random targets generation
-NofT=10;                        % number of targets
-u_target=um+Du*rand(1,NofT);    % target u-coordinates
-r_target=rm+Dr*rand(1,NofT);    % target r-coordinates
+
+% NofT=10;                        % number of targets
+% u_target=um+Du*rand(1,NofT);    % target u-coordinates
+% r_target=rm+Dr*rand(1,NofT);    % target r-coordinates
+% sigma_target=ones(1,NofT).';    % target sigma  
+
 %% Testing targets
+
+% Four (4) targets
 % u_target=[0 350 0 -350];
 % r_target=[rm rM rM rm+Dr/2];
+% sigma_target=ones(1,4).';      
+
+% One target
+% u_target=[0 ];
+% r_target=[rm+Dr/2];
+% sigma_target=1;      
+
+% Square target plus random point targets
+NofT=10;                                        % number of random point targets
+u_target_r=um+Du*rand(1,NofT);                  % point target u-coordinates
+r_target_r=rm+Dr*rand(1,NofT);                  % point target r-coordinates
+sigma_target_r=ones(1,NofT);                    % point target sigmas  
+ut=[-20:20];                                    % square target u-coordinates
+rt=[1980:2020];                                 % square target r-coordinates
+[Ut,Rt]=meshgrid(ut,rt);                        % square target (u,r) mesh coordinates 
+u_target=Ut(:).';                               % square target u-coordinates
+r_target=Rt(:).';                               % square target r-coordinates
+sigma_target=0.5*ones(size(u_target));          % square target sigma
+u_target=[u_target,u_target_r];                 % square plus point target u-coordinates
+r_target=[r_target,r_target_r];                 % square plus point target r-coordinates
+sigma_target=[sigma_target,sigma_target_r].';   % sigma of square plus point targets
 
 %% Radar travel animation and raw data generation
 u=-Du/2;                        % [m] initial uav position
@@ -106,20 +132,34 @@ while u<=Du/2;
     if l_ioft==0
         e(n,:)=zeros(1,nfft);
     else
-        D=(2/c).*sqrt((u_target(ioft)-u).^2+(r_target(ioft)).^2).'-ti;
-        E=P.*exp(-1j*2*pi*D*(f0+f));
+        % Delay insertion
+        R=sqrt((u_target(ioft)-u).^2+(r_target(ioft)).^2).';
+        D=(2/c).*R-ti;
+        
+        % Echoes without geometric attenuation and without speckle noise
+        E=P.*(sigma_target(ioft)).*(exp(-1j*2*pi*D*(f0+f)));
+        
+        % Echoes with geometric attenuation
+        % E=P.*(sigma_target(ioft)).*(exp(-1j*2*pi*D*(f0+f)))./R;
+            
+        % Echoes with multiplicative Speckle noise
+        % E=P.*(sigma_target(ioft)).*(raylrnd(pi/4,l_ioft,nfft).*exp(1j*(-1*pi+1*pi*rand(l_ioft,nfft))).*exp(-1j*2*pi*D*(f0+f)));
+
+        % Echo formation
         e(n,:)=sum(ifft(fftshift(E),nfft,2),1);
     end
 
-    %% Addition of noise
-    N0=0.1.^2;                              % noise power density
+    %% Addition of thermal noise
+    % N0=0.001.^2;                              % noise power density with geometric attenuation
+    N0=0.1.^2;                                % noise power density without geometric attenuation
     e(n,:)=e(n,:)+sqrt(N0)*(randn(1,nfft)+1j*randn(1,nfft)); 
     
     %% Range-line visualization (A-scope)
     subplot(212)
     plot(t*c/(2e3),real(e(n,:)),'LineWidth', 1.5)
     xlim([rm rM+c*tau/2]./(1e3))
-    ylim([-5 5])
+    ylim('padded')
+    % ylim(target,limitmode,'tickaligned', 'padded')
     xlabel('$r$','Interpreter','LaTeX')
     ylabel('$e(t)$','Interpreter','LaTeX','rotation',0)
     % box off
@@ -128,7 +168,7 @@ while u<=Du/2;
     ax=gca;
     ax.MinorGridAlpha = 1;                  % Make grid lines less transparent.
     ax.MinorGridColor = [0.1, 0.7, 0.2];    % Dark Green.
-    if n==600
+    if n==500
         print('simulator.svg','-dsvg')
     end
     %% Radar position update
@@ -139,7 +179,7 @@ end
 %% Raw image 
 raw_image=e(:,1:NofS);          % extraction of samples of interest for visualization purposes
 r=t(1:NofS)*c/2;                % creating the range support vector for visualization purposes
-u=um:v*tR:uM;                   % creating the cross-range support support for visualization purposes
+u=um:v*tR:um+(n-1)*v*tR;        % creating the cross-range support support for visualization purposes
 h2=figure(2);
 set(gcf, 'WindowState', 'maximized');
 subplot(141)
